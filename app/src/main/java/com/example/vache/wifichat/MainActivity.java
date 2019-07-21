@@ -30,11 +30,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setCheckedItem(R.id.nav_history);
 
-//            FragmentManager fm = getSupportFragmentManager();
-//            FragmentTransaction ft = fm.beginTransaction();
-//
-//            ft.add(R.id.area, new HistoryFragment()).commit();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -63,11 +58,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-//        Fragment fragment = null;
-
         NavController navController = Navigation.findNavController(this, R.id.fragment);
         if (id == R.id.nav_chat && navController.getCurrentDestination().getId() != R.id.thirdFragment) {
-//            fragment = new PeersFragment();
             int n = navController.getCurrentDestination().getId() == R.id.firstFragment ? R.id.action_firstFragment_to_thirdFragment : R.id.action_secondFragment_to_thirdFragment;
             navController.navigate(n, new Bundle());
         } else if (id == R.id.nav_history && (navController.getCurrentDestination().getId() != R.id.firstFragment)) {
@@ -75,17 +67,6 @@ public class MainActivity extends AppCompatActivity
                 navController.navigate(R.id.action_thirdFragment_to_firstFragment);
             }
         }
-// else if (id == R.id.nav_history) {
-//            fragment = new HistoryFragment();
-//        }
-
-//        if (fragment != null){
-//            FragmentManager fm = getSupportFragmentManager();
-//            FragmentTransaction ft = fm.beginTransaction();
-//
-//            ft.replace(R.id.area, fragment).commit();
-//        }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

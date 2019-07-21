@@ -30,7 +30,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //todo nodo maybe for chat sending
+        //TODO nodo maybe for chat sending
     }
 
     @Override
