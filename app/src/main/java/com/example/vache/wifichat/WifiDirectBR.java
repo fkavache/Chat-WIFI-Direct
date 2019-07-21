@@ -1,15 +1,11 @@
 package com.example.vache.wifichat;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 public class WifiDirectBR extends BroadcastReceiver {
     private WifiP2pManager         mManager;
