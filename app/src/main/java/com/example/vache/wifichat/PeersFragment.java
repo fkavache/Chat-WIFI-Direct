@@ -41,8 +41,9 @@ import static android.content.Context.WIFI_P2P_SERVICE;
 
 public class PeersFragment extends Fragment implements MainContract._View {
 
-    public TextView status;
+    public  TextView status;
     private Button discover;
+    private Button send;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private List<WifiP2pDevice> peers;
@@ -55,6 +56,8 @@ public class PeersFragment extends Fragment implements MainContract._View {
     private SendReceive sendReceive;
     private ServerClass serverClass;
     private ClientClass clientClass;
+
+    int x = 0;
 
     @Nullable
     @Override
@@ -74,7 +77,14 @@ public class PeersFragment extends Fragment implements MainContract._View {
                 discoverPeers();
             }
         });
-
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MySendReceive mySendReceive = new MySendReceive("HA EXLA" + x);
+                x++ ;
+                mySendReceive.start();
+            }
+        });
     }
 
     private void discoverPeers() {
@@ -102,6 +112,7 @@ public class PeersFragment extends Fragment implements MainContract._View {
         peersV = view.findViewById(R.id.peersv);
         progressBar = view.findViewById(R.id.progressBar);
         discover = view.findViewById(R.id.discover);
+        send = view.findViewById(R.id.button);
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -132,11 +143,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
                 Toast.makeText(getActivity().getApplicationContext(), "Connected to " + p2pdevice.deviceName
                         , Toast.LENGTH_SHORT).show();
 
-                Log.d("SSSSSSSSSSSSSSSSSSSs", "device");
-                MySendReceive mySendReceive = new MySendReceive("she siro from server");
-                mySendReceive.start();
-//                mManager.requestConnectionInfo(mChannel, presenter.getConnectionInfoListener());
-
             }
 
             @Override
@@ -166,22 +172,14 @@ public class PeersFragment extends Fragment implements MainContract._View {
         if (wifiP2pInfo.groupFormed && wifiP2pInfo.isGroupOwner) {
             Log.d("LLLLLLLLLLLLLLLLLLLLLL", "SERVERRRRRR");
 
-            //            status.setText("Host");
             serverClass = new ServerClass();
             serverClass.start();
-//            String ms = "SERVER";
-//            sendReceive.write(ms.getBytes());
-            MySendReceive mySendReceive = new MySendReceive("she siro from server");
-            mySendReceive.start();
+
         } else if (wifiP2pInfo.groupFormed) {
 //            status.setText("Client");
             Log.d("LLLLLLLLLLLLLLLLLLLLL", "CLIENTTTTTT");
             clientClass = new ClientClass(goa);
             clientClass.start();
-            MySendReceive mySendReceive = new MySendReceive("she siro");
-            mySendReceive.start();
-//            String ms = "CLIENT";
-//            sendReceive.write(ms.getBytes());
         }
 
     }
