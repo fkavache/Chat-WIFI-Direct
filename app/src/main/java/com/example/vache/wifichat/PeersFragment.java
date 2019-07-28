@@ -1,9 +1,11 @@
 package com.example.vache.wifichat;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -22,13 +24,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -41,9 +43,10 @@ import static android.content.Context.WIFI_P2P_SERVICE;
 
 public class PeersFragment extends Fragment implements MainContract._View {
 
-    public  TextView status;
+    public TextView status;
     private Button discover;
-    private Button send;
+    private Button sendButton;
+    private Button disconnectButton;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private List<WifiP2pDevice> peers;
@@ -56,6 +59,7 @@ public class PeersFragment extends Fragment implements MainContract._View {
     private SendReceive sendReceive;
     private ServerClass serverClass;
     private ClientClass clientClass;
+    private boolean isServer;
 
     int x = 0;
 
@@ -77,12 +81,20 @@ public class PeersFragment extends Fragment implements MainContract._View {
                 discoverPeers();
             }
         });
-        send.setOnClickListener(new View.OnClickListener() {
+        sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MySendReceive mySendReceive = new MySendReceive("HA EXLA" + x);
-                x++ ;
+                x++;
                 mySendReceive.start();
+            }
+        });
+
+        disconnectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Disconnect disconnect = new Disconnect();
+                disconnect.run();
             }
         });
     }
@@ -112,7 +124,8 @@ public class PeersFragment extends Fragment implements MainContract._View {
         peersV = view.findViewById(R.id.peersv);
         progressBar = view.findViewById(R.id.progressBar);
         discover = view.findViewById(R.id.discover);
-        send = view.findViewById(R.id.button);
+        sendButton = view.findViewById(R.id.button);
+        disconnectButton = view.findViewById(R.id.disconnect_butt);
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -175,13 +188,21 @@ public class PeersFragment extends Fragment implements MainContract._View {
             serverClass = new ServerClass();
             serverClass.start();
 
+            isServer = true;
+
         } else if (wifiP2pInfo.groupFormed) {
 //            status.setText("Client");
             Log.d("LLLLLLLLLLLLLLLLLLLLL", "CLIENTTTTTT");
             clientClass = new ClientClass(goa);
             clientClass.start();
+            isServer = false;
         }
 
+    }
+
+    @Override
+    public Context getViewContext() {
+        return getActivity();
     }
 
     @Override
@@ -204,13 +225,26 @@ public class PeersFragment extends Fragment implements MainContract._View {
         @Override
         public void run() {
             try {
-                serverSocket = new ServerSocket(8888);
+                serverSocket = new ServerSocket(9999);
+                serverSocket.setReuseAddress(true);
                 socket = serverSocket.accept();
+                socket.setReuseAddress(true);
                 sendReceive = new SendReceive(socket);
                 sendReceive.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void end_() {
+            try {
+                Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
+                socket.close();
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            super.interrupt();
         }
     }
 
@@ -244,12 +278,22 @@ public class PeersFragment extends Fragment implements MainContract._View {
         @Override
         public void run() {
             try {
-                socket.connect(new InetSocketAddress(hostAddr, 8888), 500);
+                socket.connect(new InetSocketAddress(hostAddr, 9999), 500);
                 sendReceive = new SendReceive(socket);
                 sendReceive.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void end_() {
+            try {
+                Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            super.interrupt();
         }
     }
 
@@ -306,4 +350,50 @@ public class PeersFragment extends Fragment implements MainContract._View {
             return true;
         }
     });
+
+
+    private class Disconnect extends Thread {
+        @Override
+        public void run() {
+            if (mManager != null && mChannel != null) {
+                try {
+                    if (serverClass != null) {
+                        serverClass.end_();
+                        serverClass.join();
+                    }
+                    if (clientClass != null) {
+                        clientClass.end_();
+                        clientClass.join();
+                    }
+                    sendReceive = null;
+                    serverClass = null;
+                    clientClass = null;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
+                    @Override
+                    public void onGroupInfoAvailable(WifiP2pGroup group) {
+                        if (group != null && mManager != null && mChannel != null
+                                && group.isGroupOwner()) {
+                            mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+
+                                @Override
+                                public void onSuccess() {
+                                    Log.d("kai", "removeGroup onSuccess -");
+                                }
+
+                                @Override
+                                public void onFailure(int reason) {
+                                    Log.d("kai", "removeGroup onFailure -" + reason);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+
 }

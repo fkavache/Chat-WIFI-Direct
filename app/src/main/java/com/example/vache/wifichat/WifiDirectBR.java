@@ -26,15 +26,18 @@ public class WifiDirectBR extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        Log.d("XXXXXXXXXx", action);
+        Log.d("actionACTIONXXXXXXXXXx", action);
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+            Log.d("XXXXXXXXXx", "WIFI_P2P_PEERS_CHANGED_ACTION");
             if (mManager != null) {
                 mManager.requestPeers(mChannel, presenter.getPeersListener());
             }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
+
+            Log.d("XXXXXXXXXx", "WIFI_P2P_CONNECTION_CHANGED_ACTION");
             if (mManager == null) {
                 return;
             }
@@ -42,6 +45,7 @@ public class WifiDirectBR extends BroadcastReceiver {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()){
+                Log.d("XXXXXXXXXx", "Rame QENI tooo");
                 mManager.requestConnectionInfo(mChannel, presenter.getConnectionInfoListener());
             } else {
 //                mActivity.status.setText("Device disconnected");
