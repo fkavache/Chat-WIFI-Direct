@@ -17,6 +17,8 @@ public class MessageEntity {
 
     private long chatId;
 
+    private Long date;
+
     public long getId() {
         return id;
     }
@@ -47,5 +49,13 @@ public class MessageEntity {
 
     public void setChatId(long chatId) {
         this.chatId = chatId;
+    }
+
+    public Long getDate() {
+        return date;
+    }
+
+    public void setDate(Long date) {
+        this.date = date;
     }
 }

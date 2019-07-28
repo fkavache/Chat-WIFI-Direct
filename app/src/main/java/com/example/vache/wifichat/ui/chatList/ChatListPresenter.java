@@ -18,7 +18,7 @@ public class ChatListPresenter implements ChatListContract.Presenter {
     @Override
     public void start(String name) {
 
-        List<Chat> chats = ChatHelper.fromHalfEntities(Database.getInstance().dataDao().getChats());
+        List<Chat> chats = Database.getInstance().dataDao().getChatList();
         view.showData(chats);
     }
 

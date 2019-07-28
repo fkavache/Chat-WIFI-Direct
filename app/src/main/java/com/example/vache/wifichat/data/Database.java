@@ -4,7 +4,10 @@ package com.example.vache.wifichat.data;
 import com.example.vache.wifichat.data.entities.ChatEntity;
 import com.example.vache.wifichat.data.entities.MessageEntity;
 import com.example.vache.wifichat.data.entities.UserEntity;
+import com.example.vache.wifichat.data.helper.DateConverter;
 import com.example.vache.wifichat.ui.App;
+
+import java.util.Date;
 
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -13,7 +16,7 @@ import androidx.room.RoomDatabase;
 @androidx.room.Database(entities = {UserEntity.class, ChatEntity.class, MessageEntity.class}, version = 1)
 public abstract class Database extends RoomDatabase {
 
-    private static final String DATABASE_NAME = "initial_final_app_database_test_sxva_vafshe";
+    private static final String DATABASE_NAME = "initial_final_app_database_test_sxva_vafshe111";
 
     private static Database INSTANCE;
 
@@ -57,6 +60,7 @@ public abstract class Database extends RoomDatabase {
             MessageEntity messageEntity = new MessageEntity();
             messageEntity.setMessage("kai dzmao ra..111");
             messageEntity.setChatId(chat1.getId());
+            messageEntity.setDate(DateConverter.fromDate(new Date()));
             if (i % 2 == 0) {
                 messageEntity.setUserId(u1.getId());
             }
@@ -66,6 +70,7 @@ public abstract class Database extends RoomDatabase {
             MessageEntity messageEntity = new MessageEntity();
             messageEntity.setMessage("kai dzmao ra..222");
             messageEntity.setChatId(chat2.getId());
+            messageEntity.setDate(DateConverter.fromDate(new Date()));
             if (i < 5) {
                 messageEntity.setUserId(u2.getId());
             }

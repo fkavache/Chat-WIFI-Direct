@@ -29,9 +29,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MessageViewHolder holder, int position) {
         Message message = messages.get(position);
         holder.getMessageTextView().setText(message.getMessage());
+        holder.getDateTextView().setText(MessageViewHolder.SIMPLE_DATE_FORMAT.format(message.getDate()));
+        holder.getMessageTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.setShowDate(!holder.isShowDate());
+                holder.getDateTextView().setVisibility(holder.isShowDate() ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     @Override

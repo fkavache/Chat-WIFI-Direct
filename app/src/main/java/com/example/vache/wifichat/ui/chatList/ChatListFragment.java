@@ -10,9 +10,11 @@ import com.example.vache.wifichat.ui.model.Chat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -50,6 +52,7 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
 
     @Override
     public void showData(List<Chat> chats) {
+        ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle("History(" + chats.size() + ")");
         adapter.setData(chats);
         adapter.notifyDataSetChanged();
     }

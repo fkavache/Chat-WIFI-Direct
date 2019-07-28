@@ -28,7 +28,7 @@ public class MessageHelper {
         res.setId(entity.getId());
         res.setUserId(entity.getUserId());
         res.setMessage(entity.getMessage());
-//        res.setDate(entity.getDate()); todo nodo
+        res.setDate(DateConverter.toDate(entity.getDate()));
         res.setChatId(entity.getChatId());
         return res;
     }
@@ -52,7 +52,7 @@ public class MessageHelper {
         res.setId(message.getId());
         res.setUserId(message.getUserId());
         res.setMessage(message.getMessage());
-//        res.setDate(message.getDate());
+        res.setDate(DateConverter.fromDate(message.getDate()));
         res.setChatId(message.getChatId());
         return res;
     }
