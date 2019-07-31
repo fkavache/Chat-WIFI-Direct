@@ -39,7 +39,7 @@ public class ChatListAdapter extends RecyclerView.Adapter {
             final Chat chat = chats.get(position / 2);
             ChatViewHolder chatViewHolder = (ChatViewHolder) holder;
             chatViewHolder.getNameTextView().setText(chat.getUser().getName());
-            chatViewHolder.getDatesTextView().setText(MessageViewHolder.SIMPLE_DATE_FORMAT.format(chat.getLastMessageDate()));
+            chatViewHolder.getDatesTextView().setText(chat.getLastMessageDate() == null ? "" : MessageViewHolder.SIMPLE_DATE_FORMAT.format(chat.getLastMessageDate()));
             chatViewHolder.getMessagesCountTextView().setText(chat.getCountMessages() + "");
             chatViewHolder.getBack().setOnClickListener(new View.OnClickListener() {
                 @Override

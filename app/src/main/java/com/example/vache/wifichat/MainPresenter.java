@@ -22,6 +22,9 @@ public class MainPresenter implements MainContract._Presenter {
     private MainContract._View view;
     private List<WifiP2pDevice> peers;
 
+
+    private String currentPeerName;
+
     public MainPresenter(MainContract._View view) {
         this.view = view;
 //        String[] permissions = {android.Manifest.permission.ACCESS_WIFI_STATE,
@@ -41,7 +44,7 @@ public class MainPresenter implements MainContract._Presenter {
     public void onClickPresenter(WifiP2pDevice p2pdevice) {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = p2pdevice.deviceAddress;
-
+        currentPeerName = p2pdevice.deviceName;
         view.onClickView(p2pdevice, config);
     }
 
@@ -91,5 +94,13 @@ public class MainPresenter implements MainContract._Presenter {
                 ActivityCompat.requestPermissions((Activity) context, new String[]{permission}, 1);
             }
         }
+    }
+
+    public String getCurrentPeerName() {
+        return currentPeerName;
+    }
+
+    public void setCurrentPeerName(String currentPeerName) {
+        this.currentPeerName = currentPeerName;
     }
 }

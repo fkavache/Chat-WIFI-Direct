@@ -34,4 +34,5 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'android.arch.navigation:navigation-fragment:1.0.0'
+    implementation 'androidx.fragment:fragment:1.2.0-alpha01'
 }

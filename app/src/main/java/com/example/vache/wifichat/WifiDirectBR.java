@@ -48,6 +48,7 @@ public class WifiDirectBR extends BroadcastReceiver {
                 Log.d("XXXXXXXXXx", "Rame QENI tooo");
                 mManager.requestConnectionInfo(mChannel, presenter.getConnectionInfoListener());
             } else {
+                int c = 1;
 //                mActivity.status.setText("Device disconnected");
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {

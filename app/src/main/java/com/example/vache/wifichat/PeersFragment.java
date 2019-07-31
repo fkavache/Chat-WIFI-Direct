@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -13,12 +12,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,10 +47,7 @@ public class PeersFragment extends Fragment implements MainContract._View {
     private ProgressBar progressBar;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntentFilter;
-    private SendReceive sendReceive;
-    private ServerClass serverClass;
-    private ClientClass clientClass;
-    private boolean isServer;
+
 
     int x = 0;
 
@@ -81,22 +69,20 @@ public class PeersFragment extends Fragment implements MainContract._View {
                 discoverPeers();
             }
         });
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MySendReceive mySendReceive = new MySendReceive("HA EXLA" + x);
-                x++;
-                mySendReceive.start();
-            }
-        });
-
-        disconnectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Disconnect disconnect = new Disconnect();
-                disconnect.run();
-            }
-        });
+//        sendButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//            }
+//        });
+// todo nodo
+//        disconnectButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Disconnect disconnect = new Disconnect();
+//                disconnect.run();
+//            }
+//        });
     }
 
     private void discoverPeers() {
@@ -129,6 +115,9 @@ public class PeersFragment extends Fragment implements MainContract._View {
 
         progressBar.setVisibility(View.VISIBLE);
 
+        Utils.getInstance().setManager(mManager);
+        Utils.getInstance().setChannel(mChannel);
+
         presenter = new MainPresenter(this);
         adapter = new PeersAdapter(presenter);
 
@@ -153,6 +142,7 @@ public class PeersFragment extends Fragment implements MainContract._View {
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
+                presenter.setCurrentPeerName(p2pdevice.deviceName);
                 Toast.makeText(getActivity().getApplicationContext(), "Connected to " + p2pdevice.deviceName
                         , Toast.LENGTH_SHORT).show();
 
@@ -181,23 +171,16 @@ public class PeersFragment extends Fragment implements MainContract._View {
 
     @Override
     public void connectionInfoListenerHandler(WifiP2pInfo wifiP2pInfo, InetAddress goa) {
-        Log.d("SSSSSSSSSSSSSSSSSSSs", "conInfo");
-        if (wifiP2pInfo.groupFormed && wifiP2pInfo.isGroupOwner) {
-            Log.d("LLLLLLLLLLLLLLLLLLLLLL", "SERVERRRRRR");
-
-            serverClass = new ServerClass();
-            serverClass.start();
-
-            isServer = true;
-
-        } else if (wifiP2pInfo.groupFormed) {
-//            status.setText("Client");
-            Log.d("LLLLLLLLLLLLLLLLLLLLL", "CLIENTTTTTT");
-            clientClass = new ClientClass(goa);
-            clientClass.start();
-            isServer = false;
-        }
-
+        Toast.makeText(getActivity().getApplicationContext(), "Connected !!!!!!!!!!!!!!"
+                , Toast.LENGTH_SHORT).show();
+        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment);
+        Bundle args = new Bundle();
+        args.putBoolean("isEditMode", true);
+        args.putBoolean("isServer", wifiP2pInfo.groupFormed && wifiP2pInfo.isGroupOwner);
+        args.putSerializable("goa", goa);
+        args.putString("p2pDeviceName", presenter.getCurrentPeerName());
+        args.putBoolean("groupedFormed", wifiP2pInfo.groupFormed);
+        navController.navigate(R.id.action_thirdFragment_to_secondFragment, args);
     }
 
     @Override
@@ -216,183 +199,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(mReceiver);
-    }
-
-    public class ServerClass extends Thread {
-        Socket socket;
-        ServerSocket serverSocket;
-
-        @Override
-        public void run() {
-            try {
-                serverSocket = new ServerSocket(9999);
-                serverSocket.setReuseAddress(true);
-                socket = serverSocket.accept();
-                socket.setReuseAddress(true);
-                sendReceive = new SendReceive(socket);
-                sendReceive.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void end_() {
-            try {
-                Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
-                socket.close();
-                serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            super.interrupt();
-        }
-    }
-
-    public class MySendReceive extends Thread {
-        private String msg;
-
-        public MySendReceive(String msg) {
-            this.msg = msg;
-        }
-
-        @Override
-        public void run() {
-            try {
-                sendReceive.write(msg.getBytes());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    public class ClientClass extends Thread {
-        Socket socket;
-        String hostAddr;
-
-        public ClientClass(InetAddress hostAddress) {
-            hostAddr = hostAddress.getHostAddress();
-            socket = new Socket();
-        }
-
-        @Override
-        public void run() {
-            try {
-                socket.connect(new InetSocketAddress(hostAddr, 9999), 500);
-                sendReceive = new SendReceive(socket);
-                sendReceive.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void end_() {
-            try {
-                Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            super.interrupt();
-        }
-    }
-
-    public class SendReceive extends Thread {
-        private Socket socket;
-        private InputStream inputStream;
-        private OutputStream outputStream;
-
-        public SendReceive(Socket sct) {
-            socket = sct;
-            try {
-                inputStream = socket.getInputStream();
-                outputStream = socket.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            byte[] buf = new byte[1024];
-            int bytes;
-            while (socket != null) {
-                try {
-                    bytes = inputStream.read(buf);
-                    if (bytes > 0) {
-                        handler.obtainMessage(1, bytes, -1, buf).sendToTarget();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void write(byte[] bytes) {
-            try {
-                outputStream.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message message) {
-            switch (message.what) {
-                case 1:
-                    byte[] readBuff = (byte[]) message.obj;
-                    String msg = new String(readBuff, 0, message.arg1);
-                    status.setText(msg);
-                    break;
-            }
-            return true;
-        }
-    });
-
-
-    private class Disconnect extends Thread {
-        @Override
-        public void run() {
-            if (mManager != null && mChannel != null) {
-                try {
-                    if (serverClass != null) {
-                        serverClass.end_();
-                        serverClass.join();
-                    }
-                    if (clientClass != null) {
-                        clientClass.end_();
-                        clientClass.join();
-                    }
-                    sendReceive = null;
-                    serverClass = null;
-                    clientClass = null;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
-                    @Override
-                    public void onGroupInfoAvailable(WifiP2pGroup group) {
-                        if (group != null && mManager != null && mChannel != null
-                                && group.isGroupOwner()) {
-                            mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
-
-                                @Override
-                                public void onSuccess() {
-                                    Log.d("kai", "removeGroup onSuccess -");
-                                }
-
-                                @Override
-                                public void onFailure(int reason) {
-                                    Log.d("kai", "removeGroup onFailure -" + reason);
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        }
     }
 
 

@@ -61,6 +61,7 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
     public void startChat(Chat chat) {
         NavController navController = Navigation.findNavController(getActivity(), R.id.recyvler_view_list_chat);
         Bundle args = new Bundle();
+        args.putBoolean("isEditMode", false);
         args.putSerializable("chat", chat);
         navController.navigate(R.id.action_firstFragment_to_secondFragment, args);
     }

@@ -42,6 +42,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         });
     }
 
+    public void addMessage(Message msg){
+        messages.add(msg);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return messages.size();
