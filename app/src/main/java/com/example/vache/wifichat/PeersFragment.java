@@ -36,8 +36,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
 
     public TextView status;
     private Button discover;
-    private Button sendButton;
-    private Button disconnectButton;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private List<WifiP2pDevice> peers;
@@ -64,22 +62,9 @@ public class PeersFragment extends Fragment implements MainContract._View {
             @Override
             public void onClick(View view) {
                 discoverPeers();
+                progressBar.setVisibility(View.VISIBLE);
             }
         });
-//        sendButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
-// todo nodo
-//        disconnectButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Disconnect disconnect = new Disconnect();
-//                disconnect.run();
-//            }
-//        });
     }
 
     private void discoverPeers() {
@@ -107,10 +92,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
         peersV = view.findViewById(R.id.peersv);
         progressBar = view.findViewById(R.id.progressBar);
         discover = view.findViewById(R.id.discover);
-        sendButton = view.findViewById(R.id.button);
-        disconnectButton = view.findViewById(R.id.disconnect_butt);
-
-        progressBar.setVisibility(View.VISIBLE);
 
         presenter = new MainPresenter(this);
         adapter = new PeersAdapter(presenter);
@@ -157,7 +138,7 @@ public class PeersFragment extends Fragment implements MainContract._View {
             status.setText("No Device Found");
             adapter.setData(new ArrayList<WifiP2pDevice>());
         } else {
-//            status.setText("");
+            status.setText(peers.size() + " Device found");
             adapter.setData(peers);
         }
         progressBar.setVisibility(View.INVISIBLE);
@@ -165,8 +146,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
 
     @Override
     public void connectionInfoListenerHandler(WifiP2pInfo wifiP2pInfo, InetAddress goa) {
-        Toast.makeText(getActivity().getApplicationContext(), "Connected !!!!!!!!!!!!!!"
-                , Toast.LENGTH_SHORT).show();
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment);
         Bundle args = new Bundle();
         args.putBoolean("isEditMode", true);

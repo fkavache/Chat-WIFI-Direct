@@ -81,22 +81,6 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         // Inflate the layout for this fragment
 
         View res = inflater.inflate(R.layout.fragment_chat, container, false);
-        sendButton = res.findViewById(R.id.send_message_butt);
-        sendText = res.findViewById(R.id.send_message_input);
-
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity().getApplicationContext(), "SEND"
-                        , Toast.LENGTH_SHORT).show();
-                String msg = sendText.getText().toString();
-                if (!msg.isEmpty()) {
-                    presenter.sendMsg(msg, true);
-                    sendText.setText("");
-                }
-            }
-        });
-
         return res;
     }
 
@@ -147,6 +131,24 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         presenter.start();
+
+        sendButton = view.findViewById(R.id.send_message_butt);
+        sendText = view.findViewById(R.id.send_message_input);
+
+        if (isEditMode) {
+            sendButton.setVisibility(View.VISIBLE);
+            sendText.setVisibility(View.VISIBLE);
+            sendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String msg = sendText.getText().toString();
+                    if (!msg.isEmpty()) {
+                        presenter.sendMsg(msg, true);
+                        sendText.setText("");
+                    }
+                }
+            });
+        }
     }
 
     @Override

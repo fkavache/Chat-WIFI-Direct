@@ -44,7 +44,7 @@ public class MainPresenter implements MainContract._Presenter {
     public void onClickPresenter(WifiP2pDevice p2pdevice) {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = p2pdevice.deviceAddress;
-        currentPeerName = p2pdevice.deviceName;
+//        currentPeerName = p2pdevice.deviceName;
         view.onClickView(p2pdevice, config);
     }
 
