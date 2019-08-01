@@ -1,6 +1,9 @@
 package com.example.vache.wifichat.ui.chat;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -12,6 +15,7 @@ import android.widget.Toast;
 
 
 import com.example.vache.wifichat.R;
+import com.example.vache.wifichat.WifiDirectBR;
 import com.example.vache.wifichat.ui.model.Chat;
 import com.example.vache.wifichat.ui.model.Message;
 
@@ -37,6 +41,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private ImageButton sendButton;
     private EditText sendText;
     Boolean isEditMode = null;
+    private boolean backPressed = false;
 
     public ChatFragment() {
     }
@@ -49,30 +54,26 @@ public class ChatFragment extends Fragment implements ChatContract.View {
             public void handleOnBackPressed() {
                 if (isEditMode != null && isEditMode) {
                     new AlertDialog.Builder(getContext())
-                            .setTitle("Delete entry")
-                            .setMessage("Are you sure you want to delete this entry?")
+                            .setTitle("Warning")
+                            .setMessage("Are you sure you want to disconnect?")
 
-                            // Specifying a listener allows you to take an action before dismissing the dialog.
-                            // The dialog is automatically dismissed when a dialog button is clicked.
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // Continue with delete operation
+                                    backPressed = true;
+//                                        closeChat();
+                                    presenter.disconnect();
                                 }
                             })
 
-                            // A null listener allows the button to dismiss the dialog and take no further action.
-                            .setNegativeButton(android.R.string.no, null)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setNegativeButton(android.R.string.cancel, null)
                             .show();
 
                 }
-                //todo nodo backing
-                NavHostFragment.findNavController(ChatFragment.this).navigateUp();
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-        //TODO nodo maybe for chat sending
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -162,7 +163,17 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
     @Override
     public void disconnect() {
+        super.onDestroy();
+    }
 
+    @Override
+    public Context getActivityView() {
+        return getActivity();
+    }
+
+    @Override
+    public void closeChat() {
+        NavHostFragment.findNavController(ChatFragment.this).navigateUp();
     }
 
 
@@ -180,6 +191,21 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
     @Override
     public void onDestroy() {
+//        if (!backPressed)
+//            presenter.disconnect();
         super.onDestroy();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.registerBR();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.unregisterBR();
+    }
+
 }

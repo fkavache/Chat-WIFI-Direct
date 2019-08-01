@@ -1,6 +1,7 @@
 package com.example.vache.wifichat.ui.chat;
 
 
+import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.telephony.AccessNetworkConstants;
 import android.util.Log;
 
 import com.example.vache.wifichat.Utils;
+import com.example.vache.wifichat.WifiDirectBR;
 import com.example.vache.wifichat.data.Database;
 import com.example.vache.wifichat.ui.model.Chat;
 import com.example.vache.wifichat.ui.model.Message;
@@ -21,6 +23,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ChatPresenter implements ChatContract.Presenter {
+    private static final String SCEPIAL_MSG = "TAVZARIKO777";
     private ChatContract.View view;
     private Chat chat;
     private String p2pDeviceName;
@@ -33,6 +36,9 @@ public class ChatPresenter implements ChatContract.Presenter {
     private Boolean isEditMode;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
+    private IntentFilter mIntentFilter;
+    private ChatBR mReceiver;
+    private boolean needGoHome;
 
     public ChatPresenter(ChatContract.View view, Chat chat, String p2pDeviceName, Boolean isServer, Boolean groupFormed, InetAddress goa, Boolean isEditMode) {
         this.view = view;
@@ -44,6 +50,12 @@ public class ChatPresenter implements ChatContract.Presenter {
         this.isEditMode = isEditMode;
         mManager = Utils.getInstance().getManager();
         mChannel = Utils.getInstance().getChannel();
+        mIntentFilter = new IntentFilter();
+
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
     @Override
@@ -86,8 +98,29 @@ public class ChatPresenter implements ChatContract.Presenter {
 
     @Override
     public void disconnect() {
-        Disconnect disconnect = new Disconnect();
-        disconnect.start();
+        if (isServer) {
+            Disconnect disconnect = new Disconnect();
+            disconnect.start();
+        } else {
+            MySendReceive mySendReceive = new MySendReceive(SCEPIAL_MSG);
+            mySendReceive.start();
+        }
+    }
+
+    @Override
+    public void registerBR() {
+        mReceiver = new ChatBR(mManager, mChannel, this);
+        view.getActivityView().registerReceiver(mReceiver, mIntentFilter);
+    }
+
+    @Override
+    public void unregisterBR() {
+        view.getActivityView().unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void closeChat() {
+        view.closeChat();
     }
 
     public class ServerClass extends Thread {
@@ -99,6 +132,7 @@ public class ChatPresenter implements ChatContract.Presenter {
             try {
                 serverSocket = new ServerSocket(9999);
                 serverSocket.setReuseAddress(true);
+                serverSocket.setSoTimeout(60000);
                 socket = serverSocket.accept();
                 socket.setReuseAddress(true);
                 sendReceive = new SendReceive(socket);
@@ -217,7 +251,11 @@ public class ChatPresenter implements ChatContract.Presenter {
                     byte[] readBuff = (byte[]) message.obj;
                     String msg = new String(readBuff, 0, message.arg1);
                     if (!msg.isEmpty()) {
-                        sendMsg(msg, false);
+                        if (msg.equals(ChatPresenter.SCEPIAL_MSG)) {
+                            ChatPresenter.this.disconnect();
+                        } else {
+                            sendMsg(msg, false);
+                        }
                     }
                     break;
             }
@@ -254,13 +292,13 @@ public class ChatPresenter implements ChatContract.Presenter {
 
                                 @Override
                                 public void onSuccess() {
-                                    view.disconnect();
-                                    Log.d("kai", "removeGroup onSuccess -");
+                                    Log.e("kai", "removeGroup onSuccess -");
+                                    needGoHome = true;
                                 }
 
                                 @Override
                                 public void onFailure(int reason) {
-                                    Log.d("kai", "removeGroup onFailure -" + reason);
+                                    Log.e("kai", "removeGroup onFailure -" + reason);
                                 }
                             });
                         }
@@ -268,5 +306,11 @@ public class ChatPresenter implements ChatContract.Presenter {
                 });
             }
         }
+    }
+
+
+    @Override
+    public boolean isNeedGoHome() {
+        return needGoHome;
     }
 }

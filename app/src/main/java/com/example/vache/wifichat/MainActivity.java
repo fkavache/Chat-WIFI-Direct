@@ -1,10 +1,7 @@
 package com.example.vache.wifichat;
 
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -18,14 +15,20 @@ import androidx.navigation.Navigation;
 
 import android.view.MenuItem;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private WifiP2pManager mManager;
+    private WifiP2pManager.Channel mChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        init();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setCheckedItem(R.id.nav_history);
@@ -41,6 +44,15 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+    private void init() {
+        mManager = (WifiP2pManager) Objects.requireNonNull(this).getSystemService(WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+
+        Utils.getInstance().setManager(mManager);
+        Utils.getInstance().setChannel(mChannel);
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -65,6 +77,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_history && (navController.getCurrentDestination().getId() != R.id.firstFragment)) {
             if (navController.getCurrentDestination().getId() == R.id.thirdFragment) {
                 navController.navigate(R.id.action_thirdFragment_to_firstFragment);
+            } else if (navController.getCurrentDestination().getId() == R.id.secondFragment) {
+                navController.navigate(R.id.action_secondFragment_to_firstFragment);
             }
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

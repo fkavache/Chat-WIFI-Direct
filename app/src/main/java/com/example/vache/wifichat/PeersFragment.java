@@ -48,9 +48,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntentFilter;
 
-
-    int x = 0;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -104,8 +101,8 @@ public class PeersFragment extends Fragment implements MainContract._View {
 
     private void init(View view) {
         status = view.findViewById(R.id.chat_status);
-        mManager = (WifiP2pManager) Objects.requireNonNull(getActivity()).getSystemService(WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(getActivity(), getActivity().getMainLooper(), null);
+        mManager = Utils.getInstance().getManager();
+        mChannel = Utils.getInstance().getChannel();
         peers = new ArrayList<>();
         peersV = view.findViewById(R.id.peersv);
         progressBar = view.findViewById(R.id.progressBar);
@@ -114,9 +111,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
         disconnectButton = view.findViewById(R.id.disconnect_butt);
 
         progressBar.setVisibility(View.VISIBLE);
-
-        Utils.getInstance().setManager(mManager);
-        Utils.getInstance().setChannel(mChannel);
 
         presenter = new MainPresenter(this);
         adapter = new PeersAdapter(presenter);
@@ -133,7 +127,7 @@ public class PeersFragment extends Fragment implements MainContract._View {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        discoverPeers();
+//        discoverPeers();
     }
 
     @Override
