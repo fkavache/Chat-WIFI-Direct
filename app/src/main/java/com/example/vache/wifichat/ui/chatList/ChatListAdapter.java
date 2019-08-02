@@ -1,8 +1,13 @@
 package com.example.vache.wifichat.ui.chatList;
 
+import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vache.wifichat.R;
 import com.example.vache.wifichat.ui.chat.MessageViewHolder;
@@ -12,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ChatListAdapter extends RecyclerView.Adapter {
@@ -63,4 +70,49 @@ public class ChatListAdapter extends RecyclerView.Adapter {
     public void setData(List<Chat> chats) {
         this.chats = chats;
     }
+
+    public void removeChat(Chat chat){
+        chats.remove(chat);
+        notifyDataSetChanged();
+    }
+
+    public class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
+
+        private TextView nameTextView;
+        private TextView datesTextView;
+        private TextView messagesCountTextView;
+        private ConstraintLayout back;
+
+        public ChatViewHolder(@NonNull View itemView) {
+            super(itemView);
+            itemView.setOnLongClickListener(this);
+            nameTextView = itemView.findViewById(R.id.view_text_name);
+            back = itemView.findViewById(R.id.back);
+            datesTextView = itemView.findViewById(R.id.start_end_date);
+            messagesCountTextView = itemView.findViewById(R.id.count_messages);
+        }
+
+        public TextView getNameTextView() {
+            return nameTextView;
+        }
+
+        public ConstraintLayout getBack() {
+            return back;
+        }
+
+        public TextView getDatesTextView() {
+            return datesTextView;
+        }
+
+        public TextView getMessagesCountTextView() {
+            return messagesCountTextView;
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            presenter.deleteChat(chats.get(getAdapterPosition()));
+            return true;
+        }
+    }
+
 }

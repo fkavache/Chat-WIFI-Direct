@@ -11,6 +11,8 @@ public class ChatListContract {
         void showData(List<Chat> chats);
 
         void startChat(Chat chat);
+
+        void deleteChat(Chat chat);
     }
 
     public interface Presenter {
@@ -19,5 +21,6 @@ public class ChatListContract {
 
         void onClickChat(Chat chat);
 
+        void deleteChat(Chat chat);
     }
 }

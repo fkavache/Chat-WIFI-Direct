@@ -1,11 +1,14 @@
 package com.example.vache.wifichat.ui.chatList;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.vache.wifichat.R;
+import com.example.vache.wifichat.data.Database;
+import com.example.vache.wifichat.data.entities.ChatEntity;
 import com.example.vache.wifichat.ui.model.Chat;
 
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -43,6 +47,8 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
         presenter = new ChatListPresenter(this);
         adapter = new ChatListAdapter(new ArrayList<Chat>(), presenter);
 
+//        Database.getInstance().insertTestData();
+
         RecyclerView recyclerView = getView().findViewById(R.id.recyvler_view_list_chat);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -64,5 +70,26 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
         args.putBoolean("isEditMode", false);
         args.putSerializable("chat", chat);
         navController.navigate(R.id.action_firstFragment_to_secondFragment, args);
+    }
+
+    @Override
+    public void deleteChat(final Chat chat) {
+        new AlertDialog.Builder(getContext())
+        .setTitle("Delete")
+        .setMessage("Are you sure you want to delete?")
+
+        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                ChatEntity chate = new ChatEntity();
+                chate.setUserId(chat.getUser().getId());
+                Database database = Database.getInstance();
+                database.dataDao().deleteChatU(chat.getUser().getId());
+                adapter.removeChat(chat);
+                ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle("History(" + adapter.getItemCount() + ")");
+            }
+        })
+
+        .setNegativeButton(android.R.string.cancel, null)
+        .show();
     }
 }

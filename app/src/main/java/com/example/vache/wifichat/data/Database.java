@@ -34,12 +34,11 @@ public abstract class Database extends RoomDatabase {
                         .allowMainThreadQueries()
                         .build();
             }
-//            insertTestData();
         }
         return INSTANCE;
     }
 
-    public static void insertTestData() {
+    public void insertTestData() {
         UserEntity u1 = new UserEntity();
         u1.setName("chami_dzma_1");
         UserEntity u2 = new UserEntity();

@@ -68,6 +68,9 @@ public abstract class DataDao {
     @Query("SELECT * FROM chat")
     public abstract List<ChatHalfEntity> getChats();
 
+    @Query("DELETE FROM chat WHERE userId like :userId")
+    public abstract void deleteChatU(long userId);
+
     @Query("SELECT  id FROM USER WHERE name = :name")
     public abstract Long getUserId(String name);
 
@@ -92,7 +95,7 @@ public abstract class DataDao {
     @Query("SELECT MIN(date) FROM message WHERE chatId = :chatId ")
     public abstract Long getFirstMessageDate(long chatId);
 
-    @Query("SELECT MAX(id) FROM message WHERE chatId = :chatId ")
+    @Query("SELECT MAX(date) FROM message WHERE chatId = :chatId ")
     public abstract Long getLastMessageDate(long chatId);
 
     @Query("SELECT COUNT(id) FROM message WHERE chatId = :chatId ")

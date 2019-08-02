@@ -5,11 +5,9 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
-import android.telephony.AccessNetworkConstants;
 import android.util.Log;
 
 import com.example.vache.wifichat.Utils;
-import com.example.vache.wifichat.WifiDirectBR;
 import com.example.vache.wifichat.data.Database;
 import com.example.vache.wifichat.ui.model.Chat;
 import com.example.vache.wifichat.ui.model.Message;
@@ -23,7 +21,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ChatPresenter implements ChatContract.Presenter {
-    private static final String SCEPIAL_MSG = "TAVZARIKO777";
+    private static final String SPECIAL_MSG = "TAVZARIKO777";
     private ChatContract.View view;
     private Chat chat;
     private String p2pDeviceName;
@@ -68,7 +66,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         }
         if (isEditMode) {
             if (isServer) {
-                Log.d("KKKKKKKKKKKKKKKKKKKKKKK", "SERVERRRRRR");
+                Log.e("SSSSSSSSSSSSSSSSSSSS", "SERVERRRRRR");
 
                 serverClass = new ServerClass();
                 serverClass.start();
@@ -77,7 +75,7 @@ public class ChatPresenter implements ChatContract.Presenter {
 
             } else if (groupFormed) {
 //            status.setText("Client");
-                Log.d("LLLLLLLLLLLLLLLLLLLLL", "CLIENTTTTTT");
+                Log.e("SSSSSSSSSSSSSSSSSSS", "CLIENTTTTTT");
                 clientClass = new ClientClass(goa);
                 clientClass.start();
                 isServer = false;
@@ -98,13 +96,10 @@ public class ChatPresenter implements ChatContract.Presenter {
 
     @Override
     public void disconnect() {
-        if (isServer) {
-            Disconnect disconnect = new Disconnect();
-            disconnect.start();
-        } else {
-            MySendReceive mySendReceive = new MySendReceive(SCEPIAL_MSG);
-            mySendReceive.start();
-        }
+
+        Disconnect disconnect = new Disconnect();
+        disconnect.start();
+
     }
 
     @Override
@@ -207,6 +202,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         private Socket socket;
         private InputStream inputStream;
         private OutputStream outputStream;
+        private boolean end = false;
 
         public SendReceive(Socket sct) {
             socket = sct;
@@ -222,7 +218,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         public void run() {
             byte[] buf = new byte[1024];
             int bytes;
-            while (socket != null) {
+            while (socket != null && !end) {
                 try {
                     bytes = inputStream.read(buf);
                     if (bytes > 0) {
@@ -241,6 +237,10 @@ public class ChatPresenter implements ChatContract.Presenter {
                 e.printStackTrace();
             }
         }
+
+        public void setEnd() {
+            end = true;
+        }
     }
 
     Handler handler = new Handler(new Handler.Callback() {
@@ -251,7 +251,7 @@ public class ChatPresenter implements ChatContract.Presenter {
                     byte[] readBuff = (byte[]) message.obj;
                     String msg = new String(readBuff, 0, message.arg1);
                     if (!msg.isEmpty()) {
-                        if (msg.equals(ChatPresenter.SCEPIAL_MSG)) {
+                        if (msg.equals(ChatPresenter.SPECIAL_MSG)) {
                             ChatPresenter.this.disconnect();
                         } else {
                             sendMsg(msg, false);
@@ -267,43 +267,67 @@ public class ChatPresenter implements ChatContract.Presenter {
     private class Disconnect extends Thread {
         @Override
         public void run() {
-            if (mManager != null && mChannel != null) {
-                try {
-                    if (serverClass != null) {
-                        serverClass.end_();
-                        serverClass.join();
-                    }
-                    if (clientClass != null) {
-                        clientClass.end_();
-                        clientClass.join();
-                    }
-                    sendReceive = null;
-                    serverClass = null;
-                    clientClass = null;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
-                    @Override
-                    public void onGroupInfoAvailable(WifiP2pGroup group) {
-                        if (group != null && mManager != null && mChannel != null
-                                && group.isGroupOwner()) {
-                            mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
 
-                                @Override
-                                public void onSuccess() {
-                                    Log.e("kai", "removeGroup onSuccess -");
-                                    needGoHome = true;
-                                }
 
-                                @Override
-                                public void onFailure(int reason) {
-                                    Log.e("kai", "removeGroup onFailure -" + reason);
-                                }
-                            });
+            if (isServer) {
+
+                if (mManager != null && mChannel != null) {
+                    try {
+
+                        if (serverClass != null) {
+                            serverClass.end_();
+                            serverClass.join();
                         }
+                        if (clientClass != null) {
+                            clientClass.end_();
+                            clientClass.join();
+                        }
+                        if (sendReceive != null) {
+                            sendReceive.setEnd();
+
+                        }
+                        sendReceive = null;
+                        serverClass = null;
+                        clientClass = null;
+
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                });
+                    mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
+                        @Override
+                        public void onGroupInfoAvailable(WifiP2pGroup group) {
+                            if (group != null && mManager != null && mChannel != null
+                                    && group.isGroupOwner()) {
+
+                                mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+
+                                    @Override
+                                    public void onSuccess() {
+
+                                        Log.e("kai", "removeGroup onSuccess -");
+                                        needGoHome = true;
+                                    }
+
+                                    @Override
+                                    public void onFailure(int reason) {
+                                        Log.e("kai", "removeGroup onFailure -" + reason);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            } else {
+                MySendReceive mySendReceive = new MySendReceive(SPECIAL_MSG);
+                mySendReceive.start();
+                if (sendReceive != null) {
+                    try {
+                        sendReceive.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

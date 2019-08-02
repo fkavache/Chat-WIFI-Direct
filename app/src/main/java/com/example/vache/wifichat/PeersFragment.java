@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -57,6 +58,8 @@ public class PeersFragment extends Fragment implements MainContract._View {
         super.onViewCreated(view, savedInstanceState);
 
         init(view);
+
+        ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle("Chat");
 
         discover.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,6 +176,4 @@ public class PeersFragment extends Fragment implements MainContract._View {
         super.onPause();
         getActivity().unregisterReceiver(mReceiver);
     }
-
-
 }

@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,6 +40,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private ChatContract.Presenter presenter;
     private MessagesAdapter adapter;
     private ImageButton sendButton;
+    private ConstraintLayout sendMsgLayout;
     private EditText sendText;
     Boolean isEditMode = null;
     private boolean backPressed = false;
@@ -135,9 +137,10 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         sendButton = view.findViewById(R.id.send_message_butt);
         sendText = view.findViewById(R.id.send_message_input);
 
+        sendMsgLayout = view.findViewById(R.id.send_message_layout);
+
         if (isEditMode) {
-            sendButton.setVisibility(View.VISIBLE);
-            sendText.setVisibility(View.VISIBLE);
+            sendMsgLayout.setVisibility(View.VISIBLE);
             sendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

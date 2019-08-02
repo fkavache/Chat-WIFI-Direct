@@ -27,4 +27,9 @@ public class ChatListPresenter implements ChatListContract.Presenter {
         Chat fullChat = ChatHelper.fromEntity(Database.getInstance().dataDao().getChatWithValues(chat.getId()));
         view.startChat(fullChat);
     }
+
+    @Override
+    public void deleteChat(Chat chat) {
+        view.deleteChat(chat);
+    }
 }
