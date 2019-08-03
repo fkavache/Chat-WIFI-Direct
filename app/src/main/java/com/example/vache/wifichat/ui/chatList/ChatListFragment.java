@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.vache.wifichat.R;
 import com.example.vache.wifichat.data.Database;
@@ -31,6 +32,8 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
 
     private ChatListContract.Presenter presenter;
 
+    private Button clearHistory;
+
     public ChatListFragment() {
     }
 
@@ -46,8 +49,16 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
         super.onViewCreated(view, savedInstanceState);
         presenter = new ChatListPresenter(this);
         adapter = new ChatListAdapter(new ArrayList<Chat>(), presenter);
+        clearHistory = getView().findViewById(R.id.clear_history);
 
-//        Database.getInstance().insertTestData();
+        clearHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.deleteAll();
+            }
+        });
+
+        Database.getInstance().insertTestData();
 
         RecyclerView recyclerView = getView().findViewById(R.id.recyvler_view_list_chat);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -75,21 +86,39 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
     @Override
     public void deleteChat(final Chat chat) {
         new AlertDialog.Builder(getContext())
-        .setTitle("Delete")
-        .setMessage("Are you sure you want to delete?")
+            .setTitle("Delete")
+            .setMessage("Are you sure you want to delete?")
 
-        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                ChatEntity chate = new ChatEntity();
-                chate.setUserId(chat.getUser().getId());
-                Database database = Database.getInstance();
-                database.dataDao().deleteChatU(chat.getUser().getId());
-                adapter.removeChat(chat);
-                ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle("History(" + adapter.getItemCount() + ")");
-            }
-        })
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Database database = Database.getInstance();
+                    database.dataDao().deleteChatU(chat.getUser().getId());
+                    adapter.removeChat(chat);
+                    ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle("History(" + adapter.getData().size() + ")");
+                }
+            })
 
-        .setNegativeButton(android.R.string.cancel, null)
-        .show();
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
+    }
+
+    @Override
+    public void deleteAll() {
+        new AlertDialog.Builder(getContext())
+            .setTitle("Delete")
+            .setMessage("Are you sure you want to delete?")
+
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Database database = Database.getInstance();
+                    database.dataDao().deleteAll();
+                    adapter.setData(new ArrayList<Chat>());
+                    adapter.notifyDataSetChanged();
+                    ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle("History(0)");
+                }
+            })
+
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
     }
 }

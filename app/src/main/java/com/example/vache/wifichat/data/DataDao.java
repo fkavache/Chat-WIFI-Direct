@@ -71,6 +71,9 @@ public abstract class DataDao {
     @Query("DELETE FROM chat WHERE userId like :userId")
     public abstract void deleteChatU(long userId);
 
+    @Query("DELETE FROM chat")
+    public abstract void deleteAll();
+
     @Query("SELECT  id FROM USER WHERE name = :name")
     public abstract Long getUserId(String name);
 

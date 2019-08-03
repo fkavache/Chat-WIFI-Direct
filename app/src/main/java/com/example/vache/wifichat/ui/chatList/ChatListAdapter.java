@@ -71,6 +71,10 @@ public class ChatListAdapter extends RecyclerView.Adapter {
         this.chats = chats;
     }
 
+    public List<Chat> getData() {
+        return chats;
+    }
+
     public void removeChat(Chat chat){
         chats.remove(chat);
         notifyDataSetChanged();
@@ -110,7 +114,7 @@ public class ChatListAdapter extends RecyclerView.Adapter {
 
         @Override
         public boolean onLongClick(View view) {
-            presenter.deleteChat(chats.get(getAdapterPosition()));
+            presenter.deleteChat(chats.get(getAdapterPosition() / 2));
             return true;
         }
     }

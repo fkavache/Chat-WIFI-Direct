@@ -32,4 +32,9 @@ public class ChatListPresenter implements ChatListContract.Presenter {
     public void deleteChat(Chat chat) {
         view.deleteChat(chat);
     }
+
+    @Override
+    public void deleteAll() {
+        view.deleteAll();
+    }
 }

@@ -13,6 +13,8 @@ public class ChatListContract {
         void startChat(Chat chat);
 
         void deleteChat(Chat chat);
+
+        void deleteAll();
     }
 
     public interface Presenter {
@@ -22,5 +24,7 @@ public class ChatListContract {
         void onClickChat(Chat chat);
 
         void deleteChat(Chat chat);
+
+        void deleteAll();
     }
 }
