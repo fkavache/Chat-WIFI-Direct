@@ -58,7 +58,7 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
             }
         });
 
-        Database.getInstance().insertTestData();
+//        Database.getInstance().insertTestData();
 
         RecyclerView recyclerView = getView().findViewById(R.id.recyvler_view_list_chat);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -106,7 +106,7 @@ public class ChatListFragment extends Fragment implements ChatListContract.View 
     public void deleteAll() {
         new AlertDialog.Builder(getContext())
             .setTitle("Delete")
-            .setMessage("Are you sure you want to delete?")
+            .setMessage("Are you sure you want to clear history?")
 
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {

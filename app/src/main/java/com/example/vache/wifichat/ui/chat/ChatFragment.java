@@ -30,6 +30,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +44,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private ImageButton sendButton;
     private ConstraintLayout sendMsgLayout;
     private EditText sendText;
+//    private RecyclerView recyclerView;
     Boolean isEditMode = null;
     private boolean backPressed = false;
 
@@ -70,6 +73,10 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                             .setNegativeButton(android.R.string.cancel, null)
                             .show();
 
+                } else {
+                    NavController navController = Navigation.findNavController(getActivity(), R.id.fragment);
+                    int n = R.id.action_secondFragment_to_firstFragment;
+                    navController.navigate(n, new Bundle());
                 }
             }
         };
@@ -164,6 +171,8 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     @Override
     public void addMsg(Message message) {
         adapter.addMessage(message);
+        RecyclerView rv = getView().findViewById(R.id.recycler_messages);
+        rv.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
