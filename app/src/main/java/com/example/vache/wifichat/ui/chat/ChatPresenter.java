@@ -218,7 +218,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         public void run() {
             byte[] buf = new byte[1024];
             int bytes;
-            while (socket != null && !end) {
+            while (socket != null && getEnd()) {
                 try {
                     bytes = inputStream.read(buf);
                     if (bytes > 0) {
@@ -238,8 +238,12 @@ public class ChatPresenter implements ChatContract.Presenter {
             }
         }
 
-        public void setEnd() {
+        synchronized void setEnd() {
             end = true;
+        }
+
+        synchronized boolean getEnd() {
+            return end;
         }
     }
 
@@ -272,28 +276,19 @@ public class ChatPresenter implements ChatContract.Presenter {
             if (isServer) {
 
                 if (mManager != null && mChannel != null) {
-                    try {
-
-                        if (serverClass != null) {
-                            serverClass.end_();
-                            serverClass.join();
-                        }
-                        if (clientClass != null) {
-                            clientClass.end_();
-                            clientClass.join();
-                        }
-                        if (sendReceive != null) {
-                            sendReceive.setEnd();
-
-                        }
-                        sendReceive = null;
-                        serverClass = null;
-                        clientClass = null;
-
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if (sendReceive != null) {
+                        sendReceive.setEnd();
                     }
+                    if (serverClass != null) {
+                        serverClass.end_();
+                    }
+                    if (clientClass != null) {
+                        clientClass.end_();
+                    }
+                    sendReceive = null;
+                    serverClass = null;
+                    clientClass = null;
+
                     mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
                         @Override
                         public void onGroupInfoAvailable(WifiP2pGroup group) {
@@ -322,11 +317,7 @@ public class ChatPresenter implements ChatContract.Presenter {
                 MySendReceive mySendReceive = new MySendReceive(SPECIAL_MSG);
                 mySendReceive.start();
                 if (sendReceive != null) {
-                    try {
-                        sendReceive.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    sendReceive.setEnd();
                 }
             }
         }
