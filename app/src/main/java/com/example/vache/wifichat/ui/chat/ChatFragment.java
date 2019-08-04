@@ -6,6 +6,8 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.vache.wifichat.R;
 import com.example.vache.wifichat.WifiDirectBR;
+import com.example.vache.wifichat.data.Database;
 import com.example.vache.wifichat.ui.model.Chat;
 import com.example.vache.wifichat.ui.model.Message;
 
@@ -49,6 +52,11 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private boolean backPressed = false;
 
     public ChatFragment() {
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.chat_fragment_menu, menu);
     }
 
     @Override
@@ -88,7 +96,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
+        setHasOptionsMenu(true);
         View res = inflater.inflate(R.layout.fragment_chat, container, false);
         return res;
     }
@@ -125,8 +133,10 @@ public class ChatFragment extends Fragment implements ChatContract.View {
 
         if (isEditMode) {
             ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle(p2pDeviceName);
+            setHasOptionsMenu(false);
         } else {
             ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle(chat.getUser().getName());
+            setHasOptionsMenu(true);
         }
 
         //todo nodo es back
@@ -190,15 +200,31 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         NavHostFragment.findNavController(ChatFragment.this).navigateUp();
     }
 
+    @Override
+    public void deleteChat(final Chat chat) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Delete")
+                .setMessage("Are you sure you want to delete?")
+
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Database database = Database.getInstance();
+                        database.dataDao().deleteChatU(chat.getUser().getId());
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment);
+                        int n = R.id.action_secondFragment_to_firstFragment;
+                        navController.navigate(n, new Bundle());
+                    }
+                })
+
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-//            if (isFocusNameField) {
-//                nameField.clearFocus();
-//            }
-            NavHostFragment.findNavController(this).navigateUp();
-            return true;
+        if (item.getItemId() == R.id.delete_chat){
+            presenter.deleteChat();
         }
         return super.onOptionsItemSelected(item);
     }

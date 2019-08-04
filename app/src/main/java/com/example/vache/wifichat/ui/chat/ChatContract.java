@@ -18,6 +18,8 @@ public class ChatContract {
         Context getActivityView();
 
         void closeChat();
+
+        void deleteChat(Chat chat);
     }
 
     public interface Presenter {
@@ -34,5 +36,7 @@ public class ChatContract {
         void closeChat();
 
         boolean isNeedGoHome();
+
+        void deleteChat();
     }
 }

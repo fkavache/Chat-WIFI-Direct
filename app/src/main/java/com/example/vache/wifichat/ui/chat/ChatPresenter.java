@@ -337,4 +337,9 @@ public class ChatPresenter implements ChatContract.Presenter {
     public boolean isNeedGoHome() {
         return needGoHome;
     }
+
+    @Override
+    public void deleteChat() {
+        view.deleteChat(chat);
+    }
 }
