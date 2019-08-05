@@ -132,6 +132,7 @@ public class ChatPresenter implements ChatContract.Presenter {
                 socket.setReuseAddress(true);
                 sendReceive = new SendReceive(socket);
                 sendReceive.start();
+                view.removeProgress();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -179,9 +180,16 @@ public class ChatPresenter implements ChatContract.Presenter {
         @Override
         public void run() {
             try {
-                socket.connect(new InetSocketAddress(hostAddr, 9999), 500);
-                sendReceive = new SendReceive(socket);
-                sendReceive.start();
+                while (true){
+                    socket.connect(new InetSocketAddress(hostAddr, 9999), 9000);
+                    if (socket.isConnected()) {
+                        sendReceive = new SendReceive(socket);
+                        sendReceive.start();
+                        view.removeProgress();
+                        break;
+                    }
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -218,7 +226,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         public void run() {
             byte[] buf = new byte[1024];
             int bytes;
-            while (socket != null && getEnd()) {
+            while (socket != null && !getEnd()) {
                 try {
                     bytes = inputStream.read(buf);
                     if (bytes > 0) {

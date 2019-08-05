@@ -20,6 +20,8 @@ public class ChatContract {
         void closeChat();
 
         void deleteChat(Chat chat);
+
+        void removeProgress();
     }
 
     public interface Presenter {

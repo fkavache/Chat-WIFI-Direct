@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
@@ -46,8 +47,10 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     private MessagesAdapter adapter;
     private ImageButton sendButton;
     private ConstraintLayout sendMsgLayout;
+    private View chatPrView;
+    private ProgressBar chatPr;
     private EditText sendText;
-//    private RecyclerView recyclerView;
+    //    private RecyclerView recyclerView;
     Boolean isEditMode = null;
     private boolean backPressed = false;
 
@@ -73,7 +76,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     backPressed = true;
-//                                        closeChat();
+                                    //                                        closeChat();
                                     presenter.disconnect();
                                 }
                             })
@@ -104,6 +107,10 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        chatPrView = view.findViewById(R.id.chat_pr_view);
+        chatPr = view.findViewById(R.id.chat_pr_bar);
+
         Bundle args = getArguments();
         Chat chat = null;
         Boolean isServer = null;
@@ -137,6 +144,8 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         } else {
             ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().setTitle(chat.getUser().getName());
             setHasOptionsMenu(true);
+            chatPrView.setVisibility(View.GONE);
+            chatPr.setVisibility(View.GONE);
         }
 
         //todo nodo es back
@@ -220,13 +229,30 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                 .show();
     }
 
+    @Override
+    public void removeProgress() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                chatPrView.setVisibility(View.GONE);
+                chatPr.setVisibility(View.GONE);
+            }
+        });
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.delete_chat){
+        if (item.getItemId() == R.id.delete_chat) {
             presenter.deleteChat();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStop() {
+        if (isEditMode)
+            presenter.disconnect();
+        super.onStop();
     }
 
     @Override

@@ -71,7 +71,6 @@ public class PeersFragment extends Fragment implements MainContract._View {
             @Override
             public void onClick(View view) {
                 discoverPeers();
-                progressBar.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -102,6 +101,8 @@ public class PeersFragment extends Fragment implements MainContract._View {
         progressBar = view.findViewById(R.id.progressBar);
         discover = view.findViewById(R.id.discover);
 
+        progressBar.setVisibility(View.VISIBLE);
+
         presenter = new MainPresenter(this);
         adapter = new PeersAdapter(presenter);
 
@@ -118,7 +119,8 @@ public class PeersFragment extends Fragment implements MainContract._View {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             statusCheck();
         }
-//        discoverPeers();
+
+        discoverPeers();
     }
 
     @Override
