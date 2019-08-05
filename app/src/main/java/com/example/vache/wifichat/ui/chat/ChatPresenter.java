@@ -141,8 +141,12 @@ public class ChatPresenter implements ChatContract.Presenter {
         public void end_() {
             try {
                 Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
-                socket.close();
-                serverSocket.close();
+                if (socket != null) {
+                    socket.close();
+                }
+                if (serverSocket != null) {
+                    serverSocket.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -180,13 +184,19 @@ public class ChatPresenter implements ChatContract.Presenter {
         @Override
         public void run() {
             try {
-                while (true){
+                int a = 10;
+                while (true) {
                     socket.connect(new InetSocketAddress(hostAddr, 9999), 9000);
                     if (socket.isConnected()) {
                         sendReceive = new SendReceive(socket);
                         sendReceive.start();
                         view.removeProgress();
                         break;
+                    }
+                    --a;
+                    if (a == 0) {
+                        Disconnect disconnect = new Disconnect();
+                        disconnect.start();
                     }
                 }
 

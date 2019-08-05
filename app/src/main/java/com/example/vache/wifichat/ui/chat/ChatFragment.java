@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -53,6 +54,8 @@ public class ChatFragment extends Fragment implements ChatContract.View {
     //    private RecyclerView recyclerView;
     Boolean isEditMode = null;
     private boolean backPressed = false;
+
+    private boolean disconnected = false;
 
     public ChatFragment() {
     }
@@ -163,6 +166,21 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         sendButton = view.findViewById(R.id.send_message_butt);
         sendText = view.findViewById(R.id.send_message_input);
 
+//
+//        sendText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        RecyclerView rv = getView().findViewById(R.id.recycler_messages);
+//                        rv.smoothScrollToPosition(adapter.getItemCount() - 1);
+//                    }
+//                });
+//
+//            }
+//        });
+
         sendMsgLayout = view.findViewById(R.id.send_message_layout);
 
         if (isEditMode) {
@@ -219,6 +237,7 @@ public class ChatFragment extends Fragment implements ChatContract.View {
                     public void onClick(DialogInterface dialog, int which) {
                         Database database = Database.getInstance();
                         database.dataDao().deleteChatU(chat.getUser().getId());
+                        database.dataDao().deleteUser(chat.getUser().getId());
                         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment);
                         int n = R.id.action_secondFragment_to_firstFragment;
                         navController.navigate(n, new Bundle());
@@ -248,11 +267,24 @@ public class ChatFragment extends Fragment implements ChatContract.View {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onStop() {
-        if (isEditMode)
+        if (isEditMode) {
             presenter.disconnect();
+            disconnected = true;
+        }
         super.onStop();
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (disconnected) {
+            NavHostFragment.findNavController(ChatFragment.this).navigateUp();
+            disconnected = false;
+        }
     }
 
     @Override

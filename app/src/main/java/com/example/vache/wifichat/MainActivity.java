@@ -72,8 +72,10 @@ public class MainActivity extends AppCompatActivity
 
         NavController navController = Navigation.findNavController(this, R.id.fragment);
         if (id == R.id.nav_chat && navController.getCurrentDestination().getId() != R.id.thirdFragment) {
-            int n = navController.getCurrentDestination().getId() == R.id.firstFragment ? R.id.action_firstFragment_to_thirdFragment : R.id.action_secondFragment_to_thirdFragment;
-            navController.navigate(n, new Bundle());
+            if (navController.getCurrentDestination().getId() == R.id.firstFragment) {
+                int n = navController.getCurrentDestination().getId() == R.id.firstFragment ? R.id.action_firstFragment_to_thirdFragment : R.id.action_secondFragment_to_thirdFragment;
+                navController.navigate(n, new Bundle());
+            }
         } else if (id == R.id.nav_history && (navController.getCurrentDestination().getId() != R.id.firstFragment)) {
             if (navController.getCurrentDestination().getId() == R.id.thirdFragment) {
                 navController.navigate(R.id.action_thirdFragment_to_firstFragment);

@@ -68,19 +68,25 @@ public abstract class DataDao {
     @Query("SELECT * FROM chat")
     public abstract List<ChatHalfEntity> getChats();
 
-    @Query("DELETE FROM chat WHERE userId like :userId")
+    @Query("DELETE FROM chat WHERE userId = :userId")
     public abstract void deleteChatU(long userId);
+
+    @Query("DELETE FROM user WHERE id = :userId")
+    public abstract void deleteUser(long userId);
 
     @Query("DELETE FROM chat")
     public abstract void deleteAll();
 
+    @Query("DELETE FROM user")
+    public abstract void deleteAllUser();
+
     @Query("SELECT  id FROM USER WHERE name = :name")
     public abstract Long getUserId(String name);
 
-    @Query("SELECT * FROM chat WHERE id like :id")
+    @Query("SELECT * FROM chat WHERE id = :id")
     public abstract ChatFullEntity getChatWithValues(long id);
 
-    @Query("SELECT * FROM chat WHERE userId like :userId")
+    @Query("SELECT * FROM chat WHERE userId = :userId")
     public abstract ChatFullEntity getChatWithValuesByUser(long userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
