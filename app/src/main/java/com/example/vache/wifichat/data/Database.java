@@ -16,7 +16,7 @@ import androidx.room.RoomDatabase;
 @androidx.room.Database(entities = {UserEntity.class, ChatEntity.class, MessageEntity.class}, version = 1)
 public abstract class Database extends RoomDatabase {
 
-    private static final String DATABASE_NAME = "initial_final_app_database_test_sxva_vafshe111";
+    private static final String DATABASE_NAME = "direct_app_db";
 
     private static Database INSTANCE;
 

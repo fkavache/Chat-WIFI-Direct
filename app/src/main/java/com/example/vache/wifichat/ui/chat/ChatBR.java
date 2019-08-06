@@ -33,30 +33,9 @@ public class ChatBR extends BroadcastReceiver {
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-            Log.e("PPPPPPPPPPPPPPPPPP", "WIFI_P2P_PEERS_CHANGED_ACTION");
-//            if (mManager != null) {
-//                mManager.requestPeers(mChannel, presenter.getPeersListener());
-//            }
             presenter.closeChat();
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
-            Log.e("PPPPPPPPPPPPPPPPPP", "WIFI_P2P_CONNECTION_CHANGED_ACTION");
-//            if (presenter.isNeedGoHome()) {
-//                presenter.closeChat();
-//            }
-//            if (mManager == null) {
-//                return;
-//            }
-//
-//            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-//
-//            if (networkInfo.isConnected()){
-//                Log.e("PPPPPPPPPPPPPPPPPP", "Rame QENI tooo");
-//                mManager.requestConnectionInfo(mChannel, presenter.getConnectionInfoListener());
-//            } else {
-//                int c = 1;
-////                mActivity.status.setText("Device disconnected");
-//            }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
 
         }

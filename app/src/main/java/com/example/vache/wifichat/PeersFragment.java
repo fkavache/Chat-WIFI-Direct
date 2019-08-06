@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -116,11 +119,40 @@ public class PeersFragment extends Fragment implements MainContract._View {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
+        statusCheckWifi();
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             statusCheck();
         }
 
         discoverPeers();
+    }
+
+    private void statusCheckWifi() {
+        WifiManager wifi = (WifiManager)getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (!wifi.isWifiEnabled()){
+            buildAlertMessageNoWifi();
+        }
+    }
+
+    private void buildAlertMessageNoWifi() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Your wifi seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        WifiManager wifiManager = (WifiManager)getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                        wifiManager.setWifiEnabled(true);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override

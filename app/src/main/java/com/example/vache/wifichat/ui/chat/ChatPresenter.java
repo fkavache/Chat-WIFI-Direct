@@ -66,7 +66,6 @@ public class ChatPresenter implements ChatContract.Presenter {
         }
         if (isEditMode) {
             if (isServer) {
-                Log.e("SSSSSSSSSSSSSSSSSSSS", "SERVERRRRRR");
 
                 serverClass = new ServerClass();
                 serverClass.start();
@@ -75,7 +74,6 @@ public class ChatPresenter implements ChatContract.Presenter {
 
             } else if (groupFormed) {
 //            status.setText("Client");
-                Log.e("SSSSSSSSSSSSSSSSSSS", "CLIENTTTTTT");
                 clientClass = new ClientClass(goa);
                 clientClass.start();
                 isServer = false;
@@ -140,7 +138,6 @@ public class ChatPresenter implements ChatContract.Presenter {
 
         public void end_() {
             try {
-                Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
                 if (socket != null) {
                     socket.close();
                 }
@@ -183,31 +180,30 @@ public class ChatPresenter implements ChatContract.Presenter {
 
         @Override
         public void run() {
-            try {
-                int a = 10;
-                while (true) {
-                    socket.connect(new InetSocketAddress(hostAddr, 9999), 9000);
+            int a = 10;
+            while (true) {
+                try {
+                    socket.connect(new InetSocketAddress(hostAddr, 9999), 2000);
                     if (socket.isConnected()) {
                         sendReceive = new SendReceive(socket);
                         sendReceive.start();
                         view.removeProgress();
                         break;
                     }
-                    --a;
-                    if (a == 0) {
-                        Disconnect disconnect = new Disconnect();
-                        disconnect.start();
-                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+                --a;
+                if (a == 0) {
+                    Disconnect disconnect = new Disconnect();
+                    disconnect.start();
+                }
             }
+
         }
 
         public void end_() {
             try {
-                Log.d("asas", ":asasaSAASFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFSSA");
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -318,13 +314,11 @@ public class ChatPresenter implements ChatContract.Presenter {
                                     @Override
                                     public void onSuccess() {
 
-                                        Log.e("kai", "removeGroup onSuccess -");
                                         needGoHome = true;
                                     }
 
                                     @Override
                                     public void onFailure(int reason) {
-                                        Log.e("kai", "removeGroup onFailure -" + reason);
                                     }
                                 });
                             }
