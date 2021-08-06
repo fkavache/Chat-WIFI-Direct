@@ -4,9 +4,11 @@
 Nodar Sanaia   (nsana15@freeuni.edu.ge)
 Vache Katsadze (vkats15@freeuni.edu.ge)
 
+### Introduction
+Application which allows two devices connected to the same Wi-Fi network to communicate through chat. (p2p)
+
 ### About
 The main page of the application is a list of chats, from which it is possible to go to the chat page or delete the chat itself.
-
 
 When selecting chat in the navigation drawer, there is the peer search page, 
 where when you open the page, you first ask for the permission of the location 
@@ -31,5 +33,7 @@ client wants to leave the conversation, it sends the server keyword
 "TAVZARIKO777", after which the server disconnects.
 
 Application is tested and works on following SDK: 21/23/26/28
+
+### Screenshots
 
 <img src="Screenshots/6.png"/>
